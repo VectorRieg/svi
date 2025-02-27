@@ -16,7 +16,7 @@ class Comprador {
     }
 }
 
-public class Teatro {
+public class svi2 {
     static int[][] assentos = new int[10][10];
     static int totalVendas = 0;
     static double totalCaixa = 0;
