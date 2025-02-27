@@ -6,20 +6,22 @@ class Comprador {
     String cpf;
     String tipoIngresso;
     String filme;
-    public Comprador(String nome, int idade, String cpf, String tipoIngresso, String filme, String assento) {
+
+    public Comprador(String nome, int idade, String cpf, String tipoIngresso, String filme) {
         this.nome = nome;
         this.idade = idade;
         this.cpf = cpf;
         this.tipoIngresso = tipoIngresso;
         this.filme = filme;
-        this.assento = assento;
     }
 }
+
 public class Teatro {
     static int[][] assentos = new int[10][10];
     static int totalVendas = 0;
     static double totalCaixa = 0;
     static Scanner input = new Scanner(System.in);
+
     public static void main(String[] args) {
         int opcao;
         do {
@@ -49,6 +51,7 @@ public class Teatro {
             }
         } while (opcao != 4);
     }
+
     public static void venderIngresso() {
         System.out.print("Digite seu nome (ou digite 'voltar' para retornar): ");
         String nome = input.next();
@@ -83,33 +86,20 @@ public class Teatro {
             default -> "Desconhecido";
         };
 
-        System.out.print("Digite a linha desejada (A-K) ou 'Z' para voltar: ");
+        System.out.print("Digite a linha desejada (A-J) ou 'Z' para voltar: ");
         char linha = Character.toUpperCase(input.next().charAt(0));
         if (linha == 'Z') return;
-        System.out.print("Digite o número do assento desejado (0-10) ou 'Z' para voltar: ");
-        char assento = Character.toUpperCase(input.next().charAt(0));
-        if (assento == 'Z') return;
-
-    }
-    public static void processarVenda(Comprador comprador, char linha, int assento) {
-        double precoBase = 20.00;
-        double precoFinal = comprador.tipoIngresso.equals("Meia") ? precoBase / 2 : precoBase;
-        int lin = linha - 'A';
-        if (lin < 0 || lin >= 10 || assento < 0 || assento >= 10) {
-            System.out.println("Posição inválida!");
+        System.out.print("Digite a coluna desejada (0-9) ou -1 para voltar: ");
+        int coluna = input.nextInt();
+        if (coluna == -1 || linha < 'A' || linha > 'J' || coluna < 0 || coluna >= 10) {
+            System.out.println("Posição inválida! Tente novamente.");
             return;
         }
 
-        if (assentos[lin][assento] == 0) {
-            assentos[lin][assento] = 1;
-            totalCaixa += precoFinal;
-            totalVendas++;
-            realizarPagamento(precoFinal, comprador, linha, assento);
-        } else {
-            System.out.println("Assento já ocupado!");
-        }
+        processarVenda(new Comprador(nome, idade, cpf, tipoIngresso, filme), linha, coluna);
     }
-    public static void realizarPagamento(double valor, Comprador comprador, char linha, int assento) {
+
+    public static void realizarPagamento(double valor) {
         System.out.println("Escolha a forma de pagamento:");
         System.out.println("1 - Cartão");
         System.out.println("2 - Dinheiro");
@@ -133,33 +123,45 @@ public class Teatro {
             System.out.println("Pagamento realizado com sucesso em Dinheiro!");
         } else {
             System.out.println("Opção inválida, tente novamente!");
-            realizarPagamento(valor, comprador, linha, assento);
+            realizarPagamento(valor);
         }
-
-        consultarAssentos();
-
     }
+
+    public static void processarVenda(Comprador comprador, char linha, int coluna) {
+        double precoBase = 20.00;
+        double precoFinal = comprador.tipoIngresso.equals("Meia") ? precoBase / 2 : precoBase;
+        int lin = linha - 'A';
+
+        if (assentos[lin][coluna] == 0) {
+            assentos[lin][coluna] = 1;
+            totalCaixa += precoFinal;
+            totalVendas++;
+            realizarPagamento(precoFinal);
+            
+            System.out.println("\nVenda realizada com sucesso!");
+            System.out.println("Comprador: " + comprador.nome);
+            System.out.println("CPF: " + comprador.cpf);
+            System.out.println("Filme: " + comprador.filme);
+            System.out.println("Tipo de ingresso: " + comprador.tipoIngresso);
+            System.out.printf("Valor pago: R$ %.2f\n", precoFinal);
+        } else {
+            System.out.println("Assento já ocupado!");
+        }
+    }
+
     public static void relatorioVendas() {
-        System.out.println("\nRELATÓRIO DE VENDAS");
+        System.out.println("\nRelatório de Vendas:");
         System.out.println("Total de ingressos vendidos: " + totalVendas);
         System.out.printf("Total arrecadado: R$ %.2f\n", totalCaixa);
     }
-    public static void consultarAssentos() {
-        System.out.println("\nAssentos disponíveis:");
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (assentos[i][j] == 0) {
-                    System.out.println((char) ('A' + i) + "" + j + " está disponível");
-                }
-            }
-        }
-        System.out.println("\nVenda realizada com sucesso!");
-        System.out.println("Comprador: " + comprador.nome);
-        System.out.println("CPF: " + comprador.cpf);
-        System.out.println("Filme: " + comprador.filme);
-        System.out.println("Tipo de ingresso: " + comprador.tipoIngresso);
-        System.out.printf("Valor pago: R$ %.2f\n", valor);
-        System.out.println("Assento: " + comprador.assento);
-    }
 
+    public static void consultarAssentos() {
+        System.out.println("\nMapa de Assentos:");
+        for (int i = 0; i < assentos.length; i++) {
+            for (int j = 0; j < assentos[i].length; j++) {
+                System.out.print((assentos[i][j] == 0 ? "[ ]" : "[X]") + " ");
+            }
+            System.out.println();
+        }
+    }
 }
