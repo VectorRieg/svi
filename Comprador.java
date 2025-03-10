@@ -1,32 +1,23 @@
 package svi;
 
 /**
- * Classe que representa um comprador de ingresso para um filme.
+ * Representa um comprador de ingresso para um filme.
  */
 public class Comprador {
-    /** Nome do comprador */
-    String nome;
-    
-    /** Idade do comprador */
-    int idade;
-    
-    /** CPF do comprador */
-    String cpf;
-    
-    /** Tipo de ingresso adquirido pelo comprador */
-    String tipoIngresso;
-    
-    /** Filme para o qual o ingresso foi comprado */
-    String filme;
+    private String nome;
+    private int idade;
+    private String cpf;
+    private String tipoIngresso;
+    private String filme;
 
     /**
-     * Construtor da classe Comprador.
-     * 
-     * @param nome Nome do comprador
-     * @param idade Idade do comprador
-     * @param cpf CPF do comprador
-     * @param tipoIngresso Tipo de ingresso adquirido
-     * @param filme Filme para o qual o ingresso foi comprado
+     * Construtor para criar um comprador.
+     *
+     * @param nome         Nome do comprador
+     * @param idade        Idade do comprador
+     * @param cpf          CPF do comprador
+     * @param tipoIngresso Tipo de ingresso adquirido (Inteiro ou Meia-entrada)
+     * @param filme        Nome do filme escolhido
      */
     public Comprador(String nome, int idade, String cpf, String tipoIngresso, String filme) {
         this.nome = nome;
@@ -35,4 +26,21 @@ public class Comprador {
         this.tipoIngresso = tipoIngresso;
         this.filme = filme;
     }
+
+    // Métodos getters e setters para acessar os atributos
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public int getIdade() { return idade; }
+    public void setIdade(int idade) { this.idade = idade; }
+
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+
+    public String getTipoIngresso() { return tipoIngresso; }
+    public void setTipoIngresso(String tipoIngresso) { this.tipoIngresso = tipoIngresso; }
+
+    public String getFilme() { return filme; }
+    public void setFilme(String filme) { this.filme = filme; }
 }

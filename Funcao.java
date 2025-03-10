@@ -3,22 +3,20 @@ package svi;
 import java.util.Scanner;
 
 /**
- * Classe Funcao que gerencia a venda de ingressos para um cinema.
- * Inclui funcionalidades para venda, pagamento, consulta de assentos e relatório de vendas.
+ * Classe responsável pelo gerenciamento da venda de ingressos e assentos no cinema.
  */
 public class Funcao {
-    static int[][] assentos = new int[10][10]; // Matriz representando os assentos do cinema (10x10)
-    static int totalVendas = 0; // Contador do total de ingressos vendidos
-    static double totalCaixa = 0; // Total arrecadado com as vendas
-    static Scanner input = new Scanner(System.in); // Scanner para entrada de dados
+    private int[][] assentos = new int[10][10]; // Matriz para representar os assentos (0 = livre, 1 = ocupado)
+    private int totalVendas = 0; // Contador de ingressos vendidos
+    private double totalCaixa = 0; // Valor total arrecadado
+    private Scanner input = new Scanner(System.in); // Scanner para entrada de dados do usuário
 
     /**
-     * Método para realizar a venda de um ingresso.
-     * Coleta informações do comprador, escolhe assento e processa a venda.
+     * Realiza a venda de um ingresso, solicitando informações ao usuário.
      */
-    public static void venderIngresso() {
-        input.nextLine(); // Limpeza do buffer do scanner
-        System.out.print("Digite seu nome (ou digite 'voltar' para retornar): ");
+    public void venderIngresso() {
+        input.nextLine(); // Limpa buffer do Scanner
+        System.out.print("Digite seu nome (ou 'voltar' para sair): ");
         String nome = input.nextLine();
         if (nome.equalsIgnoreCase("voltar")) return;
 
@@ -26,25 +24,19 @@ public class Funcao {
         int idade = input.nextInt();
         System.out.print("Digite seu CPF: ");
         String cpf = input.next();
-        
-        // Escolha do tipo de ingresso
+
         System.out.println("Escolha o tipo de ingresso:");
         System.out.println("1 - Inteiro");
         System.out.println("2 - Meia-entrada");
-        System.out.println("3 - Voltar");
         int tipoEscolhido = input.nextInt();
-        if (tipoEscolhido == 3) return;
         String tipoIngresso = (tipoEscolhido == 1) ? "Inteiro" : "Meia";
-        
-        // Escolha do filme
+
         System.out.println("Escolha um filme:");
         System.out.println("1 - Filme A");
         System.out.println("2 - Filme B");
         System.out.println("3 - Filme C");
         System.out.println("4 - Filme D");
-        System.out.println("5 - Voltar");
         int filmeEscolhido = input.nextInt();
-        if (filmeEscolhido == 5) return;
         String filme = switch (filmeEscolhido) {
             case 1 -> "Filme A";
             case 2 -> "Filme B";
@@ -53,29 +45,53 @@ public class Funcao {
             default -> "Desconhecido";
         };
 
-        // Escolha do assento
-        System.out.print("Digite a linha desejada (A-J) ou 'Z' para voltar: ");
+        System.out.print("Digite a linha desejada (A-J): ");
         char linha = Character.toUpperCase(input.next().charAt(0));
-        if (linha == 'Z') return;
-        System.out.print("Digite a coluna desejada (0-9) ou -1 para voltar: ");
+        System.out.print("Digite a coluna desejada (0-9): ");
         int coluna = input.nextInt();
-        if (coluna == -1 || linha < 'A' || linha > 'J' || coluna < 0 || coluna >= 10) {
-            System.out.println("Posição inválida! Tente novamente.");
-            return;
-        }
 
         processarVenda(new Comprador(nome, idade, cpf, tipoIngresso, filme), linha, coluna);
     }
 
     /**
-     * Método para processar o pagamento do ingresso.
-     * @param valor Valor a ser pago
+     * Processa a venda do ingresso e aloca o assento.
+     *
+     * @param comprador Objeto do tipo Comprador
+     * @param linha     Letra da linha do assento (A-J)
+     * @param coluna    Número da coluna do assento (0-9)
      */
-    public static void realizarPagamento(double valor) {
+    private void processarVenda(Comprador comprador, char linha, int coluna) {
+        double precoBase = 20.00;
+        double precoFinal = comprador.getTipoIngresso().equals("Meia") ? precoBase / 2 : precoBase;
+        int lin = linha - 'A'; // Converte a letra da linha em índice numérico
+
+        if (assentos[lin][coluna] == 0) {
+            assentos[lin][coluna] = 1;
+            totalCaixa += precoFinal;
+            totalVendas++;
+            realizarPagamento(precoFinal);
+
+            System.out.println("\nVenda realizada com sucesso!");
+            System.out.println("Comprador: " + comprador.getNome());
+            System.out.println("Filme: " + comprador.getFilme());
+            System.out.println("Tipo de ingresso: " + comprador.getTipoIngresso());
+            System.out.printf("Valor pago: R$ %.2f\n", precoFinal);
+        } else {
+            System.out.println("Assento já ocupado!");
+        }
+    }
+
+    /**
+     * Realiza o pagamento do ingresso.
+     *
+     * @param valor Valor do ingresso
+     */
+    private void realizarPagamento(double valor) {
         System.out.println("Escolha a forma de pagamento:");
         System.out.println("1 - Cartão");
         System.out.println("2 - Dinheiro");
         int pagamento = input.nextInt();
+
         if (pagamento == 1) {
             System.out.println("Pagamento de R$" + valor + " realizado com Cartão!");
         } else if (pagamento == 2) {
@@ -83,15 +99,10 @@ public class Funcao {
             do {
                 System.out.print("Digite o valor em dinheiro: R$ ");
                 valorPago = input.nextDouble();
-                if (valorPago < valor) {
-                    System.out.println("Valor insuficiente! Insira um valor igual ou superior a R$ " + valor);
-                }
             } while (valorPago < valor);
-            
+
             double troco = valorPago - valor;
-            if (troco > 0) {
-                System.out.printf("Troco: R$ %.2f\n", troco);
-            }
+            if (troco > 0) System.out.printf("Troco: R$ %.2f\n", troco);
             System.out.println("Pagamento realizado com sucesso em Dinheiro!");
         } else {
             System.out.println("Opção inválida, tente novamente!");
@@ -100,46 +111,18 @@ public class Funcao {
     }
 
     /**
-     * Método para processar a venda do ingresso e registrar no sistema.
-     * @param comprador Objeto contendo os dados do comprador
-     * @param linha Linha do assento escolhido
-     * @param coluna Coluna do assento escolhido
+     * Exibe o relatório de vendas.
      */
-    public static void processarVenda(Comprador comprador, char linha, int coluna) {
-        double precoBase = 20.00;
-        double precoFinal = comprador.tipoIngresso.equals("Meia") ? precoBase / 2 : precoBase;
-        int lin = linha - 'A';
-
-        if (assentos[lin][coluna] == 0) {
-            assentos[lin][coluna] = 1;
-            totalCaixa += precoFinal;
-            totalVendas++;
-            realizarPagamento(precoFinal);
-            
-            System.out.println("\nVenda realizada com sucesso!");
-            System.out.println("Comprador: " + comprador.nome);
-            System.out.println("CPF: " + comprador.cpf);
-            System.out.println("Filme: " + comprador.filme);
-            System.out.println("Tipo de ingresso: " + comprador.tipoIngresso);
-            System.out.printf("Valor pago: R$ %.2f\n", precoFinal);
-        } else {
-            System.out.println("Assento já ocupado!");
-        }
-    }
-
-    /**
-     * Método que exibe um relatório de vendas com o total de ingressos vendidos e arrecadação.
-     */
-    public static void relatorioVendas() {
+    public void relatorioVendas() {
         System.out.println("\nRelatório de Vendas:");
         System.out.println("Total de ingressos vendidos: " + totalVendas);
         System.out.printf("Total arrecadado: R$ %.2f\n", totalCaixa);
     }
 
     /**
-     * Método que exibe o mapa de assentos do cinema, mostrando assentos disponíveis e ocupados.
+     * Exibe o mapa dos assentos, indicando quais estão ocupados ou disponíveis.
      */
-    public static void consultarAssentos() {
+    public void consultarAssentos() {
         System.out.println("\nMapa de Assentos:");
         for (int i = 0; i < assentos.length; i++) {
             for (int j = 0; j < assentos[i].length; j++) {
